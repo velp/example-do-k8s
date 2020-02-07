@@ -2,6 +2,7 @@ package main
 
 import (
 	"context"
+	"flag"
 	"log"
 	"os"
 	"time"
@@ -11,6 +12,7 @@ import (
 	metaV1 "k8s.io/apimachinery/pkg/apis/meta/v1"
 	"k8s.io/client-go/kubernetes"
 	"k8s.io/client-go/tools/clientcmd"
+	"k8s.io/klog"
 )
 
 type TokenSource struct {
@@ -25,6 +27,8 @@ func (t *TokenSource) Token() (*oauth2.Token, error) {
 }
 
 func main() {
+	klog.InitFlags(nil)
+	flag.Parse()
 	DOToken := os.Getenv("DO_TOKEN")
 	ClusterID := os.Getenv("DO_CLUSTER_ID")
 	Namespace := os.Getenv("K8S_NAMESPACE")
@@ -46,6 +50,7 @@ func main() {
 	log.Printf("Server: %s", creds.Server)
 	log.Printf("CA: %s", creds.CertificateAuthorityData)
 	log.Printf("Token: %s", creds.Token)
+	log.Printf("Token expires at: %s", creds.ExpiresAt)
 	// Init k8s client
 	clientConfig, err := clientcmd.BuildConfigFromFlags(creds.Server, "")
 	if err != nil {
